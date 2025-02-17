@@ -14,9 +14,16 @@ describe('AppController', () => {
     appController = app.get<AppController>(AppController);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+  describe('getcode', () => {
+    it('should return code "12345"', () => {
+      expect(appController.getCode()).toEqual({ code: '12345' });
+    });
+  });
+
+  describe('plus', () => {
+    it('should return sum of two numbers', () => {
+      expect(appController.plus('5', '6')).toEqual({ result: 11 });
+      expect(appController.plus('10', '20')).toEqual({ result: 30 });
     });
   });
 });
