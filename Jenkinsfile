@@ -1,6 +1,10 @@
 pipeline {
     agent any
     
+    tools {
+        nodejs 'Node 18'
+    }
+    
     environment {
         DOCKER_REGISTRY = 'ghcr.io/khris-xp'
         IMAGE_NAME = 'spdx-jenkins-assignment'
