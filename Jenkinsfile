@@ -44,7 +44,7 @@ pipeline {
 
         stage('Push Image to Registry') {
             steps {
-                sh 'echo $REGISTRY_CREDENTIALS_PSW  | docker login -u $DOCKER_CREDENTIALS_USR --password-stdin'
+                sh 'echo $DOCKER_CREDENTIALS_PSW  | docker login -u $DOCKER_CREDENTIALS_USR --password-stdin'
                 sh "docker push ${IMAGE_NAME}:${BUILD_ID}"
             }
         }
@@ -56,7 +56,8 @@ pipeline {
             steps {
                 sh returnStatus: true, script: "docker stop ${APP_NAME}"
                 sh returnStatus: true, script: "docker rm ${APP_NAME}"
-                sh 'echo $DOCKER_CREDENTIALS_PSW | docker login -u $DOCKER_CREDENTIALS_USR --password-stdin'
+                sh 'echo $DOCKER_CREDENTIALS_PSW  | docker login -u $DOCKER_CREDENTIALS_USR --password-stdin'
+                sh "docker pull ${IMAGE_NAME}:${BUILD_ID}"
                 sh "docker run -dp 5000:5001 --name ${APP_NAME} ${IMAGE_NAME}:${BUILD_ID}"
             }
         }
