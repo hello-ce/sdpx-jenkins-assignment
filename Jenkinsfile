@@ -16,19 +16,25 @@ pipeline {
         
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                nodejs(nodeJSInstallationName: 'Node 18') {
+                    sh 'npm install'
+                }
             }
         }
         
         stage('Unit Tests') {
             steps {
-                sh 'npm run test'
+                nodejs(nodeJSInstallationName: 'Node 18') {
+                    sh 'npm run test'
+                }
             }
         }
 
         stage('Build') {
             steps {
-                sh 'npm run build'
+                nodejs(nodeJSInstallationName: 'Node 18') {
+                    sh 'npm run build'
+                }
             }
         }
 
