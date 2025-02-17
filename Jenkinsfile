@@ -23,7 +23,7 @@ pipeline {
 
         stage('Build Image') {
             steps {
-                sh "docker build -t ${IMAGE_NAME}:${BUILD_ID} ."
+                sh "docker build -t ${DOCKER_CREDENTIALS_USR}/spdx-jenkins-assignment:${BUILD_ID} ."
             }
         }
 
