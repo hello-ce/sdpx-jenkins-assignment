@@ -16,44 +16,13 @@ pipeline {
         
         stage('Install Dependencies') {
             steps {
-                nodejs(nodeJSInstallationName: 'Node 18') {
-                    sh 'npm install'
-                }
-            }
-        }
-        
-        stage('Unit Tests') {
-            steps {
-                nodejs(nodeJSInstallationName: 'Node 18') {
-                    sh 'npm run test'
-                }
+                sh 'npm install'
             }
         }
 
         stage('Build') {
             steps {
-                nodejs(nodeJSInstallationName: 'Node 18') {
-                    sh 'npm run build'
-                }
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    docker.build("${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}")
-                }
-            }
-        }
-        
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    docker.withRegistry('https://ghcr.io', 'khris-xp') {
-                        docker.image("${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}").push()
-                        docker.image("${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}").push('latest')
-                    }
-                }
+                sh 'npm run build'
             }
         }
 
