@@ -1,68 +1,69 @@
 pipeline {
-    agent any
-    
-    tools {
-        nodejs 'Node 18'
+    agent {
+        label 'test-agent'
     }
-    
+
     environment {
-        DOCKER_REGISTRY = 'ghcr.io/khris-xp'
-        IMAGE_NAME = 'spdx-jenkins-assignment'
-        IMAGE_TAG = "${BUILD_NUMBER}"
+        IMAGE_NAME = 'ghcr.io/sdpx-2024/jenkins-assignment'
+        // REGISTRY_CREDENTIALS = credentials('ghcr-credentials')
+        REGISTRY_CREDENTIALS = credentials('ghcr-pat')
+        APP_NAME = 'plus-api'
+        ROBOT_REPO = 'https://github.com/hello-ce/sdpx-robots-testing'
+        ROBOT_BRANCH = 'main'
     }
-    
+
     stages {
-        
-        stage('Install Dependencies') {
+        stage("Install & Run Unit Tests") {
             steps {
-                sh 'npm install'
-            }
-        }
-        
-        stage('Unit Tests') {
-            steps {
-                sh 'npm run test'
+                sh "pip install -r requirements.txt"
+                sh "python3 unit_test.py"
             }
         }
 
-        stage('Build') {
+        stage('Build Image') {
             steps {
-                sh 'npm run build'
+                sh "docker build -t ${IMAGE_NAME}:${BUILD_ID} ."
             }
         }
 
-        stage("robot") {
-            agent { label 'test' }
+        stage('Run Container & Run Robot Testing') {
             steps {
-                echo 'Check for ./robot/'
-                sh 'mkdir -p robot'
-                echo 'Cloning Robot'
-                dir('./robot/') {
-                    git branch: 'main', url: "${ROBOT_GIT}"
+                sh "docker run -dp 5000:5001 --name ${APP_NAME} ${IMAGE_NAME}:${BUILD_ID}"
+                git branch: "${ROBOT_BRANCH}", url: "${ROBOT_REPO}"
+                sh "robot plus.robot"
+            }
+
+            post {
+                always {
+                    sh returnStatus: true, script: "docker stop ${APP_NAME}"
+                    sh returnStatus: true, script: "docker rm ${APP_NAME}"
                 }
-                echo 'Run Robot'
-                sh 'cd robot && python3 -m  robot --outputdir ${ROBOT_RESULTS} \
-                        --xunit output.xml \
-                        --test '*' \
-                        tests/api_tests.robot'
             }
         }
-        
-        stage('Deploy') {
+
+        stage('Push Image to Registry') {
             steps {
-                sh '''
-                    docker stop nestjs-api || true
-                    docker rm nestjs-api || true
-                    docker run -d --name nestjs-api -p 3000:3000 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
-                '''
+                sh 'echo $REGISTRY_CREDENTIALS_PSW  | docker login ghcr.io -u $REGISTRY_CREDENTIALS_USR --password-stdin'
+                sh "docker push ${IMAGE_NAME}:${BUILD_ID}"
+            }
+        }
+
+        stage('Deploy') {
+            agent {
+                label 'uat-agent'
+            }
+            steps {
+                sh returnStatus: true, script: "docker stop ${APP_NAME}"
+                sh returnStatus: true, script: "docker rm ${APP_NAME}"
+                sh 'echo $REGISTRY_CREDENTIALS_PSW  | docker login ghcr.io -u $REGISTRY_CREDENTIALS_USR --password-stdin'
+                sh "docker run -dp 5000:5001 --name ${APP_NAME} ${IMAGE_NAME}:${BUILD_ID}"
             }
         }
     }
-    
+
     post {
         always {
-            junit 'junit.xml'
-            robot 'robot-tests/reports'
+            sh "docker system prune -af"
         }
     }
 }
