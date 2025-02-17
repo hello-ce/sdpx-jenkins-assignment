@@ -4,9 +4,10 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME = 'ghcr.io/sdpx-2024/jenkins-assignment'
+        IMAGE_NAME = 'ghcr.io/sdpx-2024/sdpx-jenkins-assignment'
         // REGISTRY_CREDENTIALS = credentials('ghcr-credentials')
         REGISTRY_CREDENTIALS = credentials('ghcr-pat')
+        DOCKER_CREDENTIALS = credentials('docker-credentials')
         APP_NAME = 'plus-api'
         ROBOT_REPO = 'https://github.com/hello-ce/sdpx-robots-testing'
         ROBOT_BRANCH = 'main'
@@ -43,7 +44,7 @@ pipeline {
 
         stage('Push Image to Registry') {
             steps {
-                sh 'echo $REGISTRY_CREDENTIALS_PSW  | docker login ghcr.io -u $REGISTRY_CREDENTIALS_USR --password-stdin'
+                sh 'echo $REGISTRY_CREDENTIALS_PSW  | docker login -u $DOCKER_CREDENTIALS_USR --password-stdin'
                 sh "docker push ${IMAGE_NAME}:${BUILD_ID}"
             }
         }
