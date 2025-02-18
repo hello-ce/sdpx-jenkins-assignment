@@ -19,6 +19,7 @@ def plus(num1, num2):
                 ans = int(ans)
             
             result = {'result': ans}
+            print("eiei plub kapok")
             return jsonify(result), 200
 
         except ValueError:
