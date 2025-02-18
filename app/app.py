@@ -15,6 +15,8 @@ def plus(num1, num2):
             num1 = float(num1)
             num2 = float(num2)
 
+            print("Hello World!")
+
             ans = num1 + num2
 
             if ans.is_integer():
