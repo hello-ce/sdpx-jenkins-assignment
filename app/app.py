@@ -5,8 +5,7 @@ app = Flask(__name__)
 
 @app.route("/getcode", methods=["GET"])
 def getcode():
-    return "Hi my name is khris bharmmano"
-
+    return "qqq"
 
 @app.route("/plus/<num1>/<num2>", methods=["GET"])
 def plus(num1, num2):
@@ -21,8 +20,8 @@ def plus(num1, num2):
 
             if ans.is_integer():
                 ans = int(ans)
-
-            result = {"result": ans}
+            
+            result = {'result': ans}
             return jsonify(result), 200
 
         except ValueError:
