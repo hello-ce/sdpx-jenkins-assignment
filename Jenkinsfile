@@ -5,6 +5,8 @@ pipeline {
 
     environment {
         IMAGE_NAME = 'ghcr.io/sdpx-2024/sdpx-jenkins-assignment'
+        // REGISTRY_CREDENTIALS = credentials('ghcr-credentials')
+        REGISTRY_CREDENTIALS = credentials('ghcr-pat')
         DOCKER_CREDENTIALS = credentials('docker-credentials')
         APP_NAME = 'plus-api'
         ROBOT_REPO = 'https://github.com/hello-ce/sdpx-robots-testing'
@@ -48,6 +50,9 @@ pipeline {
         }
 
         stage('Deploy') {
+            agent {
+                label 'uat-agent'
+            }
             steps {
                 sh returnStatus: true, script: "docker stop ${APP_NAME}"
                 sh returnStatus: true, script: "docker rm ${APP_NAME}"
