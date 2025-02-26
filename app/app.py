@@ -7,6 +7,7 @@ app = Flask(__name__)
 def getcode():
     return "qqq"
 
+
 @app.route("/plus/<num1>/<num2>", methods=["GET"])
 def plus(num1, num2):
     with app.app_context():
@@ -18,8 +19,8 @@ def plus(num1, num2):
 
             if ans.is_integer():
                 ans = int(ans)
-            
-            result = {'result': ans}
+
+            result = {"result": ans}
             return jsonify(result), 200
 
         except ValueError:
@@ -45,6 +46,30 @@ def is_prime(num1):
 
         except ValueError:
             result = {"error_msg": "Input must be a valid integer"}
+            return jsonify(result), 400
+
+
+@app.route("/cir_sur/<radius>", methods=["GET"])
+def cir_sur(radius):
+    with app.app_context():
+        try:
+            r = float(radius)
+            if r < 0:
+                result = {"result": 0.00}
+                return jsonify(result), 200
+            
+            pi = 3.14
+            area = 4 * pi * r**2
+
+            # Convert to integer if the result is a whole number
+            if area.is_integer():
+                area = int(area)
+
+            result = {"result": area}
+            return jsonify(result), 200
+
+        except ValueError:
+            result = {"error_msg": "Input must be a valid number"}
             return jsonify(result), 400
 
 
