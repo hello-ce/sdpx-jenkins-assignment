@@ -5,7 +5,26 @@ app = Flask(__name__)
 
 @app.route("/getcode", methods=["GET"])
 def getcode():
-    return "Hi my name is khris bharmmano"
+    return "qqq"
+
+@app.route("/plus/<num1>/<num2>", methods=["GET"])
+def plus(num1, num2):
+    with app.app_context():
+        try:
+            num1 = float(num1)
+            num2 = float(num2)
+
+            ans = num1 + num2
+
+            if ans.is_integer():
+                ans = int(ans)
+            
+            result = {'result': ans}
+            return jsonify(result), 200
+
+        except ValueError:
+            result = {"error_msg": "Inputs must be valid numbers"}
+            return jsonify(result), 400
 
 
 @app.route("/is_prime/<num1>", methods=["GET"])
